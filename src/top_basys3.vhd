@@ -115,8 +115,8 @@ begin
             o_lights_R(2) => led(0),
             o_lights_R(1) => led(1),
             o_lights_R(0) => led(2),
-            i_left => sw(0),
-            i_right => sw(15),
+            i_left => sw(15),
+            i_right => sw(0),
             i_reset => btnR,
             i_clk => w_clk
         );

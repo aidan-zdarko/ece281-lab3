@@ -118,47 +118,34 @@ begin
 	-- CONCURRENT STATEMENTS --------------------------------------------------------	
 	
 f_Q(2) <=
-        -- OFF + right → R1 (100)
         ((not f_S(2)) and (not f_S(1)) and (not f_S(0))
-            and (not i_right) and i_left)
+            and (not i_left) and i_right)
 
-        -- R1 → R2, R2 → R3
         or (f_S(2) and (not f_S(1)))
 
-        -- Hazard: OFF → ON (111)
         or ((not f_S(2)) and (not f_S(1)) and (not f_S(0))
-            and i_right and i_left);
+            and i_left and i_right);
 
-    -- S1' (middle)
     f_Q(1) <=
-        -- L1 → L2
         ((not f_S(2)) and (not f_S(1)) and f_S(0))
 
-        -- L2 → L3
         or ((not f_S(2)) and f_S(1) and (not f_S(0)))
 
-        -- R2 → R3
         or (f_S(2) and (not f_S(1)) and f_S(0))
 
-        -- Hazard: ON (111)
         or ((not f_S(2)) and (not f_S(1)) and (not f_S(0))
-            and i_right and i_left);
+            and i_left and i_right);
 
-    -- S0' (LSB)
     f_Q(0) <=
-        -- OFF + left → L1 (001)
         ((not f_S(2)) and (not f_S(1)) and (not f_S(0))
-            and i_right and (not i_left))
+            and i_left and (not i_right))
 
-        -- L2 → L3
         or ((not f_S(2)) and f_S(1) and (not f_S(0)))
 
-        -- R1 → R2
         or (f_S(2) and (not f_S(1)) and (not f_S(0)))
 
-        -- Hazard: ON (111)
         or ((not f_S(2)) and (not f_S(1)) and (not f_S(0))
-            and i_right and i_left);
+            and i_left and i_right);
 
 	
 	o_lights_L(0) <= ((not f_Q(2)) and (not f_Q(1)) and f_Q(0))
