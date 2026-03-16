@@ -111,62 +111,30 @@ end thunderbird_fsm;
 architecture thunderbird_fsm_arch of thunderbird_fsm is 
 
 -- CONSTANTS ------------------------------------------------------------------
-    signal f_S : std_logic_vector (2 downto 0) :="000"; -- start at no lights
-    signal f_Q : std_logic_vector (2 downto 0) :="000";
+    signal f_Q : std_logic_vector (2 downto 0) :="000"; -- start at no lights
+    signal f_Q_next : std_logic_vector (2 downto 0) :="000";
 begin
 
 	-- CONCURRENT STATEMENTS --------------------------------------------------------	
 	
-f_Q(2) <=
-        ((not f_S(2)) and (not f_S(1)) and (not f_S(0))
-            and (not i_left) and i_right)
+    f_Q_next(2) <= (NOT f_Q(2) AND NOT f_Q(1) AND NOT f_Q(0) AND i_left AND NOT i_right) OR
+                   (NOT f_Q(2) AND f_Q(1) AND f_Q(0)) OR
+                   (f_Q(2) AND NOT f_Q(1) AND f_Q(0)) OR
+                   (f_Q(2) AND f_Q(1) AND NOT f_Q(0));
+    f_Q_next(1) <= (NOT f_Q(2) AND NOT f_Q(1) AND NOT f_Q(0) AND NOT i_left AND i_right) OR
+                   (f_Q(1) AND NOT f_Q(0)) OR
+                   (f_Q(2) AND NOT f_Q(1) AND f_Q(0));
+    f_Q_next(0) <= (NOT f_Q(2) AND NOT f_Q(1) AND NOT f_Q(0) AND i_left) OR
+                   (f_Q(1) AND NOT f_Q(0));
 
-        or (f_S(2) and (not f_S(1)))
+    o_lights_R(0) <= (NOT f_Q(2) AND f_Q(1)) OR (NOT f_Q(2) AND f_Q(0)) OR (f_Q(2) AND NOT f_Q(1) AND NOT f_Q(0));
+    o_lights_R(1) <= (NOT f_Q(2) AND f_Q(0)) OR (f_Q(2) AND NOT f_Q(1) AND NOT f_Q(0));
+    o_lights_R(2) <= (NOT f_Q(2) AND NOT f_Q(1) AND f_Q(0)) OR (f_Q(2) AND NOT f_Q(1) AND NOT f_Q(0));
+ 
+    o_lights_L(0) <= (f_Q(2) AND f_Q(1)) OR (f_Q(2) AND f_Q(0)) OR (NOT f_Q(2) AND NOT f_Q(1) AND f_Q(0));
+    o_lights_L(1) <= (f_Q(2) AND f_Q(1)) OR (NOT f_Q(2) AND NOT f_Q(1) AND f_Q(0));
+    o_lights_L(2) <= (f_Q(2) AND f_Q(1) AND f_Q(0)) OR (NOT f_Q(2) AND NOT f_Q(1) AND f_Q(0));
 
-        or ((not f_S(2)) and (not f_S(1)) and (not f_S(0))
-            and i_left and i_right);
-
-    f_Q(1) <=
-        ((not f_S(2)) and (not f_S(1)) and f_S(0))
-
-        or ((not f_S(2)) and f_S(1) and (not f_S(0)))
-
-        or (f_S(2) and (not f_S(1)) and f_S(0))
-
-        or ((not f_S(2)) and (not f_S(1)) and (not f_S(0))
-            and i_left and i_right);
-
-    f_Q(0) <=
-        ((not f_S(2)) and (not f_S(1)) and (not f_S(0))
-            and i_left and (not i_right))
-
-        or ((not f_S(2)) and f_S(1) and (not f_S(0)))
-
-        or (f_S(2) and (not f_S(1)) and (not f_S(0)))
-
-        or ((not f_S(2)) and (not f_S(1)) and (not f_S(0))
-            and i_left and i_right);
-
-	
-	o_lights_L(0) <= ((not f_Q(2)) and (not f_Q(1)) and f_Q(0))
-	                 or ((not f_Q(2)) and f_Q(1) and (not f_Q(0)))
-	                 or ((not f_Q(2)) and f_Q(1) and f_Q(0))
-	                 or (f_Q(2) and f_Q(1) and f_Q(0));
-	o_lights_L(1) <= ((not f_Q(2)) and f_Q(1) and (not f_Q(0)))
-	                 or ((not f_Q(2)) and f_Q(1) and f_Q(0))
-	                 or (f_Q(2) and f_Q(1) and f_Q(0));
-	o_lights_L(2) <= ((not f_Q(2)) and f_Q(1) and f_Q(0))
-	                 or (f_Q(2) and f_Q(1) and f_Q(0));
-	                 
-	o_lights_R(0) <= (f_Q(2) and (not f_Q(1)) and (not f_Q(0)))
-	                 or (f_Q(2) and (not f_Q(1)) and f_Q(0))
-	                 or (f_Q(2) and f_Q(1) and (not f_Q(0)))
-	                 or (f_Q(2) and f_Q(1) and f_Q(0));
-	o_lights_R(1) <= (f_Q(2) and (not f_Q(1)) and f_Q(0))
-	                 or (f_Q(2) and f_Q(1) and (not f_Q(0)))
-	                 or (f_Q(2) and f_Q(1) and f_Q(0));
-	o_lights_R(2) <= (f_Q(2) and f_Q(1) and (not f_Q(0)))
-	                 or (f_Q(2) and f_Q(1) and f_Q(0));
     ---------------------------------------------------------------------------------
 	
 	-- PROCESSES --------------------------------------------------------------------
@@ -174,9 +142,9 @@ f_Q(2) <=
     begin        
         if (rising_edge(i_clk)) then
             if i_reset = '1' then
-                f_S <= "000"; 
+                f_Q <= "000"; 
             else
-                f_S <= f_Q;
+                f_Q <= f_Q_next;
             end if;   
         end if;
     end process register_proc;
