@@ -116,18 +116,50 @@ architecture thunderbird_fsm_arch of thunderbird_fsm is
 begin
 
 	-- CONCURRENT STATEMENTS --------------------------------------------------------	
-	f_Q(2) <= ((not f_S(2)) and (not f_S(1)) and (not f_S(0)) and i_left and (not i_right))
-	           or ((not f_S(2)) and (not f_S(1)) and (not f_S(0)) and i_left and i_right)
-	           or (f_S(2) and (not f_S(1)) and (not f_S(0)) and i_left and (not i_right))
-	           or (f_S(2) and (not f_S(1)) and f_S(0)); 
-	f_Q(1) <= ((not f_S(2)) and (not f_S(1)) and f_S(0) and (not i_left) and i_right)
-	           or ((not f_S(2)) and f_S(1) and (not f_S(0)))
-	           or (f_S(2) and (not f_S(1)) and f_S(0))
-	           or ((not f_S(2)) and (not f_S(1)) and (not f_S(0)) and i_left and i_right); 
-	f_Q(0) <= ((not f_S(2)) and (not f_S(1)) and (not f_S(0)) and (not i_left) and i_right)
-	           or ((not f_S(2)) and f_S(1) and (not f_S(0)))
-	           or (f_S(2) and (not f_S(1)) and (not f_S(0)) and i_left and (not i_right))
-	           or ((not f_S(2)) and (not f_S(1)) and (not f_S(0)) and i_left and i_right);
+	
+f_Q(2) <=
+        -- OFF + right → R1 (100)
+        ((not f_S(2)) and (not f_S(1)) and (not f_S(0))
+            and (not i_right) and i_left)
+
+        -- R1 → R2, R2 → R3
+        or (f_S(2) and (not f_S(1)))
+
+        -- Hazard: OFF → ON (111)
+        or ((not f_S(2)) and (not f_S(1)) and (not f_S(0))
+            and i_right and i_left);
+
+    -- S1' (middle)
+    f_Q(1) <=
+        -- L1 → L2
+        ((not f_S(2)) and (not f_S(1)) and f_S(0))
+
+        -- L2 → L3
+        or ((not f_S(2)) and f_S(1) and (not f_S(0)))
+
+        -- R2 → R3
+        or (f_S(2) and (not f_S(1)) and f_S(0))
+
+        -- Hazard: ON (111)
+        or ((not f_S(2)) and (not f_S(1)) and (not f_S(0))
+            and i_right and i_left);
+
+    -- S0' (LSB)
+    f_Q(0) <=
+        -- OFF + left → L1 (001)
+        ((not f_S(2)) and (not f_S(1)) and (not f_S(0))
+            and i_right and (not i_left))
+
+        -- L2 → L3
+        or ((not f_S(2)) and f_S(1) and (not f_S(0)))
+
+        -- R1 → R2
+        or (f_S(2) and (not f_S(1)) and (not f_S(0)))
+
+        -- Hazard: ON (111)
+        or ((not f_S(2)) and (not f_S(1)) and (not f_S(0))
+            and i_right and i_left);
+
 	
 	o_lights_L(0) <= ((not f_Q(2)) and (not f_Q(1)) and f_Q(0))
 	                 or ((not f_Q(2)) and f_Q(1) and (not f_Q(0)))
