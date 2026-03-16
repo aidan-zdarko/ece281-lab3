@@ -11,7 +11,7 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="261.001 ns"></ZoomEndTime>
+      <ZoomEndTime time="333.178 ns"></ZoomEndTime>
       <Cursor1Time time="150.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
@@ -52,10 +52,12 @@
    <wvobject fp_name="/thunderbird_fsm_tb/DUT/f_S" type="array">
       <obj_property name="ElementShortName">f_S[2:0]</obj_property>
       <obj_property name="ObjectShortName">f_S[2:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="/thunderbird_fsm_tb/DUT/f_Q" type="array">
       <obj_property name="ElementShortName">f_Q[2:0]</obj_property>
       <obj_property name="ObjectShortName">f_Q[2:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="/thunderbird_fsm_tb/DUT/o_lights_L" type="array">
       <obj_property name="ElementShortName">o_lights_L[2:0]</obj_property>
