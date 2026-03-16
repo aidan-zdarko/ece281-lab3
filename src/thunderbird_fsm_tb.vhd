@@ -115,7 +115,7 @@ begin
     w_reset <= '1';
     wait until rising_edge(w_clk);
     assert w_lights_L = "000" and w_lights_R = "000"
-        report "FAIL: Reset should force OFF state (000)." severity failure;
+        report "Reset should force off" severity failure;
 
 
     w_reset <= '0';
@@ -125,53 +125,53 @@ begin
     w_right <= '1';
     wait for c_clk;
     assert w_lights_R = "000"
-        report "FAIL: Left step L1 should output 001." severity failure;
+        report "bad start" severity failure;
 
     wait for c_clk;
     assert w_lights_R = "001"
-        report "FAIL: Left step L2 should output 011." severity failure;
+        report "bad r1" severity failure;
 
     wait for c_clk;
     assert w_lights_R = "011"
-        report "FAIL: Left step L3 should output 111." severity failure;
+        report "bad r2" severity failure;
 
     wait for c_clk;
     assert w_lights_R = "111"
-        report "FAIL: Left cycle should return to OFF (000)." severity failure;
+        report "bad r3" severity failure;
 
     w_left  <= '1';
     w_right <= '0';
     wait for c_clk;
     assert w_lights_L = "000"
-        report "FAIL: Right step R1 should output 100." severity failure;
+        report "bad start" severity failure;
 
     wait for c_clk;
     assert w_lights_L = "001"
-        report "FAIL: Right step R2 should output 110." severity failure;
+        report "bad l1" severity failure;
 
     wait for c_clk;
     assert w_lights_L = "011"
-        report "FAIL: Right step R3 should output 111." severity failure;
+        report "bad l2" severity failure;
 
     wait for c_clk;
     assert w_lights_L = "111"
-        report "FAIL: Right sequence should return to OFF (000)." severity failure;
+        report "bad l3" severity failure;
 
     w_left  <= '1';
     w_right <= '1';
     wait for c_clk;
     assert w_lights_L = "000" and w_lights_R = "000"
-        report "FAIL: Hazard ON should set all lights ON (state 111)." severity failure;
+        report "bad haz off" severity failure;
 
     wait for c_clk;
     assert w_lights_L = "111" and w_lights_R = "111"
-        report "FAIL: Hazard OFF cycle should clear all lights." severity failure;
+        report "bad haz on" severity failure;
 
     w_left  <= '0';
     w_right <= '0';
     wait for c_clk;
     assert w_lights_L = "000" and w_lights_R = "000"
-        report "FAIL: FSM should return to idle OFF state after hazards cleared."
+        report "should return to off"
         severity failure;
 
     wait;
