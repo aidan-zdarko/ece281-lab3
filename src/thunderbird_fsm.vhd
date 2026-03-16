@@ -81,28 +81,86 @@
 --|    s_<signal name>          = state name
 --|
 --+----------------------------------------------------------------------------
+--| Binary State Encoding key
+--| --------------------
+--| State | Encoding
+--| --------------------
+--| OFF   | 000
+--| L1    | 001
+--| L2    | 010
+--| L3    | 011
+--| R1    | 100
+--| R2    | 101
+--| R3    | 110
+--| ON    | 111
+--| --------------------
+
 library ieee;
   use ieee.std_logic_1164.all;
   use ieee.numeric_std.all;
  
-entity thunderbird_fsm is 
---  port(
-	
---  );
+entity thunderbird_fsm is
+    port (
+        i_clk, i_reset  : in    std_logic;
+        i_left, i_right : in    std_logic;
+        o_lights_L      : out   std_logic_vector(2 downto 0);
+        o_lights_R      : out   std_logic_vector(2 downto 0)
+    );
 end thunderbird_fsm;
 
 architecture thunderbird_fsm_arch of thunderbird_fsm is 
 
 -- CONSTANTS ------------------------------------------------------------------
-  
+    signal f_S : std_logic_vector (2 downto 0) :="000"; -- start at no lights
+    signal f_Q : std_logic_vector (2 downto 0) :="000";
 begin
 
 	-- CONCURRENT STATEMENTS --------------------------------------------------------	
+	f_Q(2) <= ((not f_S(2)) and (not f_S(1)) and (not f_S(0)) and i_left and (not i_right))
+	           or ((not f_S(2)) and (not f_S(1)) and (not f_S(0)) and i_left and i_right)
+	           or (f_S(2) and (not f_S(1)) and (not f_S(0)) and i_left and (not i_right))
+	           or (f_S(2) and (not f_S(1)) and f_S(0)); 
+	f_Q(1) <= ((not f_S(2)) and (not f_S(1)) and f_S(0) and (not i_left) and i_right)
+	           or ((not f_S(2)) and f_S(1) and (not f_S(0)))
+	           or (f_S(2) and (not f_S(1)) and f_S(0))
+	           or ((not f_S(2)) and (not f_S(1)) and (not f_S(0)) and i_left and i_right); 
+	f_Q(0) <= ((not f_S(2)) and (not f_S(1)) and (not f_S(0)) and (not i_left) and i_right)
+	           or ((not f_S(2)) and f_S(1) and (not f_S(0)))
+	           or (f_S(2) and (not f_S(1)) and (not f_S(0)) and i_left and (not i_right))
+	           or ((not f_S(2)) and (not f_S(1)) and (not f_S(0)) and i_left and i_right);
 	
+	o_lights_L(0) <= ((not f_Q(2)) and (not f_Q(1)) and f_Q(0))
+	                 or ((not f_Q(2)) and f_Q(1) and (not f_Q(0)))
+	                 or ((not f_Q(2)) and f_Q(1) and f_Q(0))
+	                 or (f_Q(2) and f_Q(1) and f_Q(0));
+	o_lights_L(1) <= ((not f_Q(2)) and f_Q(1) and (not f_Q(0)))
+	                 or ((not f_Q(2)) and f_Q(1) and f_Q(0))
+	                 or (f_Q(2) and f_Q(1) and f_Q(0));
+	o_lights_L(2) <= ((not f_Q(2)) and f_Q(1) and f_Q(0))
+	                 or (f_Q(2) and f_Q(1) and f_Q(0));
+	                 
+	o_lights_R(0) <= (f_Q(2) and (not f_Q(1)) and (not f_Q(0)))
+	                 or (f_Q(2) and (not f_Q(1)) and f_Q(0))
+	                 or (f_Q(2) and f_Q(1) and (not f_Q(0)))
+	                 or (f_Q(2) and f_Q(1) and f_Q(0));
+	o_lights_R(1) <= (f_Q(2) and (not f_Q(1)) and f_Q(0))
+	                 or (f_Q(2) and f_Q(1) and (not f_Q(0)))
+	                 or (f_Q(2) and f_Q(1) and f_Q(0));
+	o_lights_R(2) <= (f_Q(2) and f_Q(1) and (not f_Q(0)))
+	                 or (f_Q(2) and f_Q(1) and f_Q(0));
     ---------------------------------------------------------------------------------
 	
 	-- PROCESSES --------------------------------------------------------------------
-    
+    register_proc : process (i_clk, i_reset)
+    begin        
+        if (rising_edge(i_clk)) then
+            if i_reset = '1' then
+                f_S <= "000"; 
+            else
+                f_S <= f_Q;
+            end if;   
+        end if;
+    end process register_proc;
 	-----------------------------------------------------					   
 				  
 end thunderbird_fsm_arch;

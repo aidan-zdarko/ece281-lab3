@@ -57,28 +57,117 @@ end thunderbird_fsm_tb;
 architecture test_bench of thunderbird_fsm_tb is 
 	
 	component thunderbird_fsm is 
---	  port(
-		
---	  );
+        port (
+            i_clk, i_reset  : in    std_logic;
+            i_left, i_right : in    std_logic;
+            o_lights_L      : out   std_logic_vector(2 downto 0);
+            o_lights_R      : out   std_logic_vector(2 downto 0)
+        );
 	end component thunderbird_fsm;
 
 	-- test I/O signals
-	
+	signal w_clk : std_logic := '0';
+	signal w_reset : std_logic := '0';
+	signal w_left : std_logic := '0';
+	signal w_right : std_logic := '0';
+	signal w_lights_R : std_logic_vector (2 downto 0);
+	signal w_lights_L : std_logic_vector (2 downto 0);
 	-- constants
-	
+	constant c_clk : time := 10 ns;
 	
 begin
 	-- PORT MAPS ----------------------------------------
-	
+	DUT : thunderbird_fsm
+	   port map (
+	       i_clk => w_clk,
+	       i_reset => w_reset,
+	       i_left => w_left,
+	       i_right => w_right,
+	       o_lights_L => w_lights_L,
+	       o_lights_R => w_lights_R
+	   );
 	-----------------------------------------------------
 	
 	-- PROCESSES ----------------------------------------	
     -- Clock process ------------------------------------
-    
+    clk_proc : process
+	begin
+		w_clk <= '0';
+        wait for c_clk/2;
+		w_clk <= '1';
+		wait for c_clk/2;
+	end process;
 	-----------------------------------------------------
 	
 	-- Test Plan Process --------------------------------
 	
+sim_proc: process
+begin
+
+    w_reset <= '1';
+    wait for c_clk;
+    assert w_lights_L = "000" and w_lights_R = "000"
+        report "FAIL: Reset should force OFF state (000)." severity failure;
+
+    w_reset <= '0';
+    wait for c_clk;
+
+    w_left  <= '1';
+    w_right <= '0';
+    wait for c_clk;
+    assert w_lights_L = "000"
+        report "FAIL: Left step L1 should output 001." severity failure;
+
+    wait for c_clk;
+    assert w_lights_L = "000"
+        report "FAIL: Left step L2 should output 011." severity failure;
+
+    wait for c_clk;
+    assert w_lights_L = "000"
+        report "FAIL: Left step L3 should output 111." severity failure;
+
+    wait for c_clk;
+    assert w_lights_L = "000"
+        report "FAIL: Left cycle should return to OFF (000)." severity failure;
+
+    w_left  <= '0';
+    w_right <= '1';
+    wait for c_clk;
+    assert w_lights_R = "000"
+        report "FAIL: Right step R1 should output 100." severity failure;
+
+    wait for c_clk;
+    assert w_lights_R = "000"
+        report "FAIL: Right step R2 should output 110." severity failure;
+
+    wait for c_clk;
+    assert w_lights_R = "000"
+        report "FAIL: Right step R3 should output 111." severity failure;
+
+    wait for c_clk;
+    assert w_lights_R = "000"
+        report "FAIL: Right sequence should return to OFF (000)." severity failure;
+
+    w_left  <= '1';
+    w_right <= '1';
+    wait for c_clk;
+    assert w_lights_L = "000" and w_lights_R = "000"
+        report "FAIL: Hazard ON should set all lights ON (state 111)." severity failure;
+
+    wait for c_clk;
+    assert w_lights_L = "111" and w_lights_R = "111"
+        report "FAIL: Hazard OFF cycle should clear all lights." severity failure;
+
+    w_left  <= '0';
+    w_right <= '0';
+    wait for c_clk;
+    assert w_lights_L = "000" and w_lights_R = "000"
+        report "FAIL: FSM should return to idle OFF state after hazards cleared."
+        severity failure;
+
+    wait;
+end process;
+
 	-----------------------------------------------------	
 	
 end test_bench;
