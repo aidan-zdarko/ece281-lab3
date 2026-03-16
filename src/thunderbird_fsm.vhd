@@ -170,7 +170,7 @@ f_Q(2) <=
     ---------------------------------------------------------------------------------
 	
 	-- PROCESSES --------------------------------------------------------------------
-    register_proc : process (i_clk, i_reset)
+    register_proc : process (i_clk)
     begin        
         if (rising_edge(i_clk)) then
             if i_reset = '1' then

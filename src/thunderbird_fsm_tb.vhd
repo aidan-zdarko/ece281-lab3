@@ -101,13 +101,22 @@ begin
 	
 	-- Test Plan Process --------------------------------
 	
+
 sim_proc: process
 begin
 
+    -- Initialize inputs
+    w_left  <= '0';
+    w_right <= '0';
+    w_reset <= '0';
+    wait until rising_edge(w_clk);
+
+    -- RESET
     w_reset <= '1';
-    wait for c_clk;
+    wait until rising_edge(w_clk);
     assert w_lights_L = "000" and w_lights_R = "000"
         report "FAIL: Reset should force OFF state (000)." severity failure;
+
 
     w_reset <= '0';
     wait for c_clk;
@@ -115,15 +124,15 @@ begin
     w_left  <= '1';
     w_right <= '0';
     wait for c_clk;
-    assert w_lights_L = "000"
+    assert w_lights_L = "001"
         report "FAIL: Left step L1 should output 001." severity failure;
 
     wait for c_clk;
-    assert w_lights_L = "000"
+    assert w_lights_L = "011"
         report "FAIL: Left step L2 should output 011." severity failure;
 
     wait for c_clk;
-    assert w_lights_L = "000"
+    assert w_lights_L = "111"
         report "FAIL: Left step L3 should output 111." severity failure;
 
     wait for c_clk;
@@ -133,15 +142,15 @@ begin
     w_left  <= '0';
     w_right <= '1';
     wait for c_clk;
-    assert w_lights_R = "000"
+    assert w_lights_R = "001"
         report "FAIL: Right step R1 should output 100." severity failure;
 
     wait for c_clk;
-    assert w_lights_R = "000"
+    assert w_lights_R = "011"
         report "FAIL: Right step R2 should output 110." severity failure;
 
     wait for c_clk;
-    assert w_lights_R = "000"
+    assert w_lights_R = "111"
         report "FAIL: Right step R3 should output 111." severity failure;
 
     wait for c_clk;
@@ -151,11 +160,11 @@ begin
     w_left  <= '1';
     w_right <= '1';
     wait for c_clk;
-    assert w_lights_L = "000" and w_lights_R = "000"
+    assert w_lights_L = "111" and w_lights_R = "111"
         report "FAIL: Hazard ON should set all lights ON (state 111)." severity failure;
 
     wait for c_clk;
-    assert w_lights_L = "111" and w_lights_R = "111"
+    assert w_lights_L = "000" and w_lights_R = "000"
         report "FAIL: Hazard OFF cycle should clear all lights." severity failure;
 
     w_left  <= '0';
