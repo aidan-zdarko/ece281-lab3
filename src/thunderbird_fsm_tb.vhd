@@ -105,12 +105,12 @@ begin
 sim_proc: process
 begin
 
-    -- Initialize inputs
-    w_left  <= '0';
-    w_right <= '0';
+    -- start and test reset
+    w_right  <= '0';
+    w_left <= '0';
     w_reset <= '0';
-    wait until rising_edge(w_clk);
-
+    wait until rising_edge(w_clk); -- rising edge because I had errors with the c_clk
+                                   -- also need because synchronous
     -- RESET
     w_reset <= '1';
     wait until rising_edge(w_clk);
