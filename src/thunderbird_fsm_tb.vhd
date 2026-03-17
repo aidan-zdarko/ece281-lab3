@@ -121,8 +121,7 @@ begin
     w_reset <= '0';
     wait for c_clk;
 
-    w_left  <= '0';
-    w_right <= '1';
+    w_left  <= '0'; w_right <= '1';
     wait for c_clk;
     assert w_lights_R = "000"
         report "bad start" severity failure;
@@ -139,8 +138,7 @@ begin
     assert w_lights_R = "111"
         report "bad r3" severity failure;
 
-    w_left  <= '1';
-    w_right <= '0';
+    w_left  <= '1'; w_right <= '0';
     wait for c_clk;
     assert w_lights_L = "000"
         report "bad start" severity failure;
@@ -157,8 +155,7 @@ begin
     assert w_lights_L = "111"
         report "bad l3" severity failure;
 
-    w_left  <= '1';
-    w_right <= '1';
+    w_left  <= '1'; w_right <= '1';
     wait for c_clk;
     assert w_lights_L = "000" and w_lights_R = "000"
         report "bad haz off" severity failure;
@@ -167,8 +164,7 @@ begin
     assert w_lights_L = "111" and w_lights_R = "111"
         report "bad haz on" severity failure;
 
-    w_left  <= '0';
-    w_right <= '0';
+    w_left  <= '0'; w_right <= '0';
     wait for c_clk;
     assert w_lights_L = "000" and w_lights_R = "000"
         report "should return to off"

@@ -111,8 +111,8 @@ end thunderbird_fsm;
 architecture thunderbird_fsm_arch of thunderbird_fsm is 
 
 -- CONSTANTS ------------------------------------------------------------------
-    signal f_Q : std_logic_vector (2 downto 0) :="000"; -- start at no lights
-    signal f_Q_next : std_logic_vector (2 downto 0) :="000";
+    signal f_S : std_logic_vector (2 downto 0) :="000"; -- start at no lights
+    signal f_Q : std_logic_vector (2 downto 0) :="000";
 begin
 
 	-- CONCURRENT STATEMENTS --------------------------------------------------------	
